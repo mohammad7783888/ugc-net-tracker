@@ -1,0 +1,533 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>UGC NET Study Tracker</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&display=swap">
+<style>:root{color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);
+--bg:#0B1020;--bg2:#121A2B;--surface:rgba(255,255,255,.045);--surface2:rgba(255,255,255,.08);
+--line:rgba(255,255,255,.09);--line2:rgba(255,255,255,.18);
+--text:#F8FAFC;--muted:#94A3B8;--violet:#8B5CF6;--violet2:#A78BFA;--cyan:#22D3EE;--pink:#F472B6;
+--ok:#34D399;--warn:#FBBF24;--err:#F87171;--teal:#22D3EE;
+--grad:linear-gradient(135deg,#8B5CF6 0%,#3B82F6 55%,#22D3EE 100%);
+--cs:#22D3EE;--cn:#A78BFA;--cq:#FBBF24;--cv:#F472B6;
+--r:18px;--pad:clamp(14px,3vw,40px);--tb:64px;
+--shadow:0 14px 34px -16px rgba(0,0,0,.7);
+--ff-h:"Sora","Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+--ff:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + var(--tb) + 20px);scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--ff);font-size:clamp(14.5px,1.6vw + 10px,16px);line-height:1.5;overflow-x:hidden;min-height:100vh}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:60}
+h1,h2,b,.t{font-family:var(--ff-h)}
+.ambient{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:0}
+.ambient i{position:absolute;width:70vmax;height:70vmax;border-radius:50%;will-change:transform;opacity:.9}
+.ambient i:nth-child(1){left:-25vmax;top:-30vmax;background:radial-gradient(circle,rgba(139,92,246,.30),transparent 62%);animation:drift1 38s ease-in-out infinite alternate}
+.ambient i:nth-child(2){right:-30vmax;top:10vmax;background:radial-gradient(circle,rgba(34,211,238,.16),transparent 62%);animation:drift2 46s ease-in-out infinite alternate}
+.ambient i:nth-child(3){left:20vmax;bottom:-40vmax;background:radial-gradient(circle,rgba(244,114,182,.12),transparent 62%);animation:drift1 52s ease-in-out infinite alternate-reverse}
+@keyframes drift1{to{transform:translate3d(8vmax,6vmax,0) scale(1.1)}}
+@keyframes drift2{to{transform:translate3d(-9vmax,5vmax,0) scale(1.15)}}
+.topbar,.hero,main,.foot{position:relative;z-index:2}
+:focus-visible{outline:2px solid var(--cyan);outline-offset:2px;border-radius:8px}
+/* ---------- top bar ---------- */
+.topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:50}
+.topbar::before{content:"";position:absolute;inset:0;background:rgba(11,16,32,.72);backdrop-filter:blur(14px) saturate(140%);-webkit-backdrop-filter:blur(14px) saturate(140%);border-bottom:1px solid var(--line);z-index:-1}
+.tb-in{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:16px;padding:10px var(--pad);min-height:var(--tb)}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--ff-h);font-weight:700;letter-spacing:.3px}
+.logo{width:34px;height:34px;border-radius:11px;background:var(--grad);display:grid;place-items:center;box-shadow:0 6px 18px -6px rgba(139,92,246,.8)}
+.logo svg{width:19px;height:19px}
+.papers{display:flex;gap:8px;justify-content:center;min-width:0}
+.papers button{position:relative;min-width:0;flex:0 1 250px;border:1px solid var(--line);background:var(--surface);color:var(--muted);font:inherit;font-weight:600;padding:8px 14px;border-radius:14px;cursor:pointer;line-height:1.2;text-align:left;transition:transform .2s,border-color .2s,background .2s,color .2s}
+.papers button small{display:block;font-weight:400;font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.85}
+.papers button:hover{border-color:var(--line2);color:var(--text);transform:translateY(-1px)}
+.papers button.on{color:#fff;border-color:transparent;background:linear-gradient(135deg,rgba(139,92,246,.9),rgba(59,130,246,.75));box-shadow:0 8px 22px -10px rgba(139,92,246,.9)}
+.tabs{display:flex;gap:4px;padding:4px;border-radius:14px;background:var(--surface);border:1px solid var(--line)}
+.tabs button{display:flex;align-items:center;gap:8px;border:0;background:transparent;color:var(--muted);font:inherit;font-weight:600;font-size:.92em;padding:8px 14px;border-radius:10px;cursor:pointer;transition:.2s}
+.tabs button svg{width:18px;height:18px;flex:none}
+.tabs button:hover{color:var(--text)}
+.tabs button.on{background:var(--surface2);color:#fff;box-shadow:inset 0 0 0 1px var(--line2)}
+.tabs button.on svg{color:var(--cyan)}
+/* ---------- hero ---------- */
+.hero{padding:clamp(26px,5vw,60px) var(--pad) clamp(10px,2vw,22px);overflow:hidden}
+.hero::after{content:"";position:absolute;right:-40px;top:-40px;width:min(520px,70vw);height:min(520px,70vw);background-image:radial-gradient(rgba(255,255,255,.16) 1px,transparent 1.4px);background-size:22px 22px;-webkit-mask-image:radial-gradient(circle at 70% 30%,#000,transparent 65%);mask-image:radial-gradient(circle at 70% 30%,#000,transparent 65%);opacity:.7;z-index:-1}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:.78rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--cyan);padding:5px 12px;border:1px solid rgba(34,211,238,.3);border-radius:99px;background:rgba(34,211,238,.07)}
+.hero h1{margin:14px 0 6px;font-size:clamp(1.9rem,5.2vw,3.6rem);line-height:1.06;letter-spacing:-.02em;font-weight:800;background:linear-gradient(120deg,#fff 20%,#C4B5FD 55%,#67E8F9);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{margin:0;color:var(--muted);font-size:clamp(.95rem,1.8vw,1.15rem);max-width:60ch}
+.chips{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.chip{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:99px;padding:6px 14px;font-size:.84rem;color:var(--text);transition:.2s}
+.chip:hover{border-color:var(--line2);transform:translateY(-1px)}
+.chip svg{width:16px;height:16px;color:var(--violet2);flex:none}
+.chip .dot{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 10px var(--ok)}
+/* ---------- layout ---------- */
+main{padding:8px var(--pad) 40px}
+.tab{display:none}.tab.on{display:block;animation:rise .45s cubic-bezier(.2,.8,.2,1)}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+#t-dash.on{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:clamp(12px,2vw,22px)}
+.a-cand{grid-column:1/-1}.a-prog{grid-column:span 7}.a-cal{grid-column:span 5;grid-row:span 2}.a-rings{grid-column:span 7}
+@media (max-width:1100px){.a-prog,.a-cal,.a-rings{grid-column:1/-1;grid-row:auto}}
+.card{position:relative;background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.025));border:1px solid var(--line);border-radius:var(--r);padding:clamp(14px,2.2vw,24px);box-shadow:var(--shadow);margin:0;transition:border-color .25s}
+#t-syl .card,#t-rev .card{margin:0 0 18px}
+.card:hover{border-color:var(--line2)}
+.card h2{margin:0 0 14px;font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700;display:flex;align-items:center;gap:10px}
+.card h2::before{content:"";width:18px;height:3px;border-radius:3px;background:var(--grad)}
+.card h2 .note{margin-left:auto}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr));gap:14px}
+label.f{display:block;font-size:.75rem;color:var(--muted);font-weight:600;margin-bottom:6px;letter-spacing:.03em}
+input[type=text],input[type=date],select{width:100%;min-height:44px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.05);color:var(--text);font:inherit;transition:border-color .2s,box-shadow .2s,background .2s;color-scheme:dark}
+input[type=text]:hover,input[type=date]:hover,select:hover{border-color:var(--line2)}
+input[type=text]:focus,input[type=date]:focus,select:focus{outline:none;border-color:var(--violet);box-shadow:0 0 0 3px rgba(139,92,246,.28);background:rgba(255,255,255,.07)}
+select option{background:#121A2B;color:#F8FAFC}
+.btn{font:inherit;font-weight:600;min-height:44px;padding:10px 18px;border:1px solid var(--line2);background:var(--surface);color:var(--text);border-radius:12px;cursor:pointer;transition:transform .15s,border-color .2s,background .2s,box-shadow .2s}
+.btn:hover{border-color:var(--violet2);background:var(--surface2);transform:translateY(-1px)}
+.btn:active{transform:scale(.97)}
+.btn.pri{background:var(--grad);border-color:transparent;color:#fff;box-shadow:0 10px 24px -10px rgba(139,92,246,.9)}
+.btn.pri:hover{filter:brightness(1.1);box-shadow:0 14px 28px -10px rgba(139,92,246,1)}
+.btn.danger{border-color:rgba(248,113,113,.45);color:#FCA5A5}.btn.danger:hover{background:rgba(248,113,113,.12);border-color:var(--err)}
+.note{font-size:.8rem;color:var(--muted)}
+.hide{display:none!important}
+/* ---------- KPIs & stages ---------- */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,120px),1fr));gap:12px}
+.kpi{border:1px solid var(--line);border-radius:14px;padding:14px;background:var(--surface);transition:transform .2s,border-color .2s}
+.kpi:hover{transform:translateY(-3px);border-color:var(--line2)}
+.kpi b{display:block;font-size:clamp(1.3rem,3vw,1.75rem);line-height:1.1;font-weight:700}
+.kpi:first-child{background:linear-gradient(135deg,rgba(139,92,246,.28),rgba(34,211,238,.12));border-color:rgba(139,92,246,.4)}
+.kpi:first-child b{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.kpi span{font-size:.76rem;color:var(--muted)}
+.stage{display:grid;grid-template-columns:minmax(110px,150px) 1fr 44px;align-items:center;gap:12px;margin:12px 0;font-size:.9rem}
+.stage .sd{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:8px;box-shadow:0 0 10px currentColor}
+.stage b{text-align:right;font-size:.85rem}
+.bar{height:10px;background:rgba(255,255,255,.07);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;border-radius:99px;transition:width .8s cubic-bezier(.2,.8,.2,1);box-shadow:0 0 14px -2px currentColor}
+.rings{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,200px),1fr));gap:12px}
+.ringcard{display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--line);border-radius:14px;cursor:pointer;background:var(--surface);transition:transform .2s,border-color .2s,background .2s;color:inherit;font:inherit;text-align:left;width:100%}
+.ringcard:hover{border-color:var(--violet2);transform:translateY(-3px);background:var(--surface2)}
+.ring{width:54px;height:54px;flex:none;position:relative}.ring svg{transform:rotate(-90deg);display:block}
+.ring b{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:.72rem}
+.rc-t{font-size:.78rem;line-height:1.3;color:var(--muted);min-width:0}.rc-t b{display:block;color:var(--text);font-size:.88rem}
+/* ---------- calendar ---------- */
+.calhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.calhead b{font-size:1.05rem}
+.calhead .btn{min-height:40px;min-width:40px;padding:6px 12px}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.dow{text-align:center;font-size:.68rem;color:var(--muted);font-weight:700;padding:2px 0;letter-spacing:.06em}
+.day{min-height:clamp(44px,6vw,62px);border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.03);display:flex;flex-direction:column;align-items:center;justify-content:center;font:inherit;font-size:.85rem;color:var(--text);cursor:pointer;position:relative;transition:transform .15s,border-color .2s,box-shadow .2s;padding:0}
+button.day:hover{transform:translateY(-2px) scale(1.04);border-color:var(--violet2);z-index:2}
+.day.out{opacity:0;pointer-events:none}
+.day.l1{background:rgba(139,92,246,.2)}.day.l2{background:rgba(139,92,246,.38)}.day.l3{background:rgba(139,92,246,.62)}
+.day.l4{background:var(--grad);border-color:transparent;font-weight:700;box-shadow:0 6px 18px -8px rgba(139,92,246,.9)}
+.day.today{border-color:var(--cyan);box-shadow:0 0 0 1px var(--cyan),0 0 16px -4px var(--cyan)}
+.day.sel{outline:2px solid #fff;outline-offset:2px}
+.day small{font-size:.62rem;opacity:.85;line-height:1}
+.day .mk{position:absolute;top:5px;right:5px;width:6px;height:6px;border-radius:50%;background:var(--pink);box-shadow:0 0 8px var(--pink)}
+.legend{display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:.72rem;color:var(--muted);margin-top:12px}
+.legend i{width:14px;height:14px;border-radius:4px;display:inline-block;border:1px solid var(--line)}
+.legend .mk2{width:7px;height:7px;border-radius:50%;background:var(--pink);border:0}
+.detail{margin-top:14px;padding:14px;border-radius:14px;background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.25);font-size:.9rem}
+.detail ul{margin:8px 0 0;padding-left:18px}.detail li{margin:4px 0}
+.tags span{display:inline-block;font-size:.62rem;font-weight:700;color:#0B1020;border-radius:99px;padding:1px 8px;margin-left:4px}
+.cal-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+/* ---------- syllabus ---------- */
+.tools{position:sticky;top:calc(env(safe-area-inset-top,0px) + var(--tb));z-index:20;display:flex;gap:10px;flex-wrap:wrap;padding:12px 0;margin-bottom:4px}
+.tools::before{content:"";position:absolute;inset:0 calc(var(--pad) * -1);background:linear-gradient(var(--bg) 70%,transparent);z-index:-1}
+.tools .sw{position:relative;flex:1;min-width:min(100%,200px)}
+.tools .sw svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:var(--muted);pointer-events:none}
+.tools .sw input{padding-left:40px}
+.tools select{width:auto;min-width:160px;flex:0 1 auto}
+.leg2{display:flex;gap:14px;flex-wrap:wrap;font-size:.78rem;color:var(--muted);margin:6px 0 12px}
+.leg2 i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;box-shadow:0 0 8px currentColor}
+.unit{margin:0 0 18px;border-radius:var(--r);overflow:hidden;border:1px solid var(--line);background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.02));box-shadow:var(--shadow)}
+.uh{display:flex;align-items:center;gap:14px;padding:clamp(12px,2vw,18px);background:linear-gradient(120deg,rgba(139,92,246,.32),rgba(59,130,246,.16) 55%,rgba(34,211,238,.1));cursor:pointer;transition:filter .2s;border-bottom:1px solid var(--line)}
+.uh:hover{filter:brightness(1.12)}
+.uh .t{flex:1;min-width:0;font-weight:700;font-size:clamp(.88rem,1.8vw,1.05rem);letter-spacing:.02em;overflow-wrap:anywhere}
+.uh .c{font-size:.74rem;color:#CBD5E1;text-align:right;white-space:nowrap}
+.uh .pb{width:clamp(70px,14vw,130px);height:6px;background:rgba(255,255,255,.14);border-radius:99px;overflow:hidden;margin-top:6px;margin-left:auto}
+.uh .pb i{display:block;height:100%;background:linear-gradient(90deg,#22D3EE,#A78BFA);width:0;transition:width .6s cubic-bezier(.2,.8,.2,1);border-radius:99px}
+.uh .caret{transition:transform .25s;color:#CBD5E1}.unit.closed .caret{transform:rotate(-90deg)}
+.ub{padding:6px clamp(8px,2vw,18px) 18px}.unit.closed .ub{display:none}
+.topic{margin-top:14px;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:rgba(11,16,32,.35)}
+.th{display:flex;align-items:center;gap:12px;padding:11px 14px;font-weight:600;background:rgba(255,255,255,.04);border-bottom:1px solid var(--line);flex-wrap:wrap}
+.th label{display:flex;gap:12px;align-items:center;flex:1;min-width:200px;cursor:pointer;overflow-wrap:break-word}
+.th .c{font-size:.74rem;color:var(--muted);font-weight:500}
+.th.done .n{text-decoration:line-through;opacity:.6}
+.th.done::after{content:"Complete";font-size:.66rem;font-weight:700;color:#052E2B;background:var(--ok);border-radius:99px;padding:2px 10px}
+.st{width:100%;border-collapse:collapse;font-size:.9rem}
+.st th{font-size:.66rem;text-align:center;color:var(--muted);padding:9px 2px;font-weight:700;cursor:pointer;user-select:none;border-bottom:1px solid var(--line);letter-spacing:.05em;text-transform:uppercase;transition:color .2s}
+.st th:first-child{text-align:left;padding-left:14px;cursor:default}
+.st th:hover:not(:first-child){color:#fff}
+.st td{padding:3px 2px;text-align:center;border-bottom:1px solid rgba(255,255,255,.05);width:clamp(46px,9vw,92px)}
+.st td:first-child{text-align:left;width:auto;padding:9px 10px 9px 14px;overflow-wrap:break-word}
+.st tr:last-child td{border-bottom:0}
+.st tr.l2 td:first-child{padding-left:36px;color:var(--muted)}
+.st tr.p td:first-child{font-weight:600}
+.st tr.full td:first-child{color:var(--ok)}
+.st tr.full td:first-child::after{content:" ✓"}
+.st tr{transition:background .2s}.st tr:hover{background:rgba(255,255,255,.035)}
+input[type=checkbox]{appearance:none;-webkit-appearance:none;width:24px;height:24px;border:2px solid var(--c,var(--cyan));border-radius:8px;background:transparent;cursor:pointer;margin:0;display:inline-grid;place-content:center;transition:transform .15s,background .2s,box-shadow .2s;flex:none;vertical-align:middle}
+input[type=checkbox]::after{content:"";width:11px;height:6px;border-left:3px solid #0B1020;border-bottom:3px solid #0B1020;transform:rotate(-45deg) scale(0);margin-top:-2px;transition:transform .18s cubic-bezier(.3,1.6,.5,1)}
+input[type=checkbox]:checked{background:var(--c,var(--cyan));box-shadow:0 0 14px -2px var(--c,var(--cyan))}
+input[type=checkbox]:checked::after{transform:rotate(-45deg) scale(1)}
+input[type=checkbox]:hover{box-shadow:0 0 0 4px color-mix(in srgb,var(--c,var(--cyan)) 25%,transparent)}
+input[type=checkbox]:active{transform:scale(.88)}
+input[type=checkbox]:focus-visible{outline:2px solid #fff;outline-offset:3px}
+input.pop{animation:pop .3s}
+@keyframes pop{50%{transform:scale(1.35)}}
+input[data-st=s]{--c:var(--cs)}input[data-st=n]{--c:var(--cn)}input[data-st=q]{--c:var(--cq)}input[data-st=v]{--c:var(--cv)}
+.uh input{--c:#fff}.th input{--c:var(--violet2)}
+@media (pointer:coarse){input[type=checkbox]{width:26px;height:26px}}
+.empty{text-align:center;padding:48px 16px;border:1px dashed var(--line2);border-radius:var(--r);color:var(--muted)}
+.empty svg{width:42px;height:42px;color:var(--violet2);margin-bottom:8px}
+.empty b{display:block;color:var(--text);font-size:1.05rem;margin-bottom:4px}
+.pane{display:none}.pane.on{display:block}
+/* ---------- revision ---------- */
+.wide{overflow-x:auto}
+table.rv{width:100%;border-collapse:separate;border-spacing:0 8px;font-size:.9rem}
+.rv th{padding:8px;font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;text-align:center;font-weight:700}
+.rv td{background:rgba(255,255,255,.04);padding:12px 8px;text-align:center;vertical-align:middle;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.rv td:first-child{text-align:left;font-weight:600;border-left:1px solid var(--line);border-radius:12px 0 0 12px}
+.rv td:last-child{border-right:1px solid var(--line);border-radius:0 12px 12px 0}
+.rv input[type=date]{margin-top:8px;min-height:38px;padding:6px 8px;font-size:.78rem;width:100%;min-width:128px}
+.rv input[type=checkbox]{--c:var(--violet2)}
+.danger-zone{display:flex;gap:10px;flex-wrap:wrap}
+/* ---------- misc ---------- */
+.foot{padding:8px var(--pad) 40px;text-align:center;color:var(--muted);font-size:.78rem}
+#toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 24px);transform:translate(-50%,24px);display:flex;align-items:center;gap:10px;background:rgba(18,26,43,.95);border:1px solid rgba(139,92,246,.5);color:#fff;padding:11px 20px;border-radius:99px;opacity:0;transition:opacity .3s,transform .3s;z-index:80;pointer-events:none;font-weight:600;box-shadow:0 16px 40px -12px rgba(139,92,246,.7);max-width:calc(100vw - 28px)}
+#toast svg{color:var(--ok);flex:none}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+.js .reveal{opacity:0;transform:translateY(18px);transition:opacity .6s cubic-bezier(.2,.8,.2,1),transform .6s cubic-bezier(.2,.8,.2,1);transition-delay:calc(var(--i,0)*70ms)}
+.js .reveal.in{opacity:1;transform:none}
+/* ---------- responsive ---------- */
+@media (max-width:899px){
+ :root{--tb:62px}
+ .tb-in{grid-template-columns:minmax(0,1fr);padding:8px var(--pad)}.papers{min-width:0}
+ .brand{display:none}
+ .papers button{flex:1 1 0}
+ .tabs{position:fixed;left:10px;right:10px;bottom:calc(env(safe-area-inset-bottom,0px) + 10px);z-index:70;justify-content:space-around;padding:6px;border-radius:20px;background:rgba(18,26,43,.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--line2);box-shadow:0 18px 40px -10px rgba(0,0,0,.8)}
+ .tabs button{flex:1;flex-direction:column;gap:3px;font-size:.7rem;padding:8px 4px;min-height:52px;justify-content:center}
+ .tabs button svg{width:22px;height:22px}
+ main{padding-bottom:110px}.foot{padding-bottom:110px}
+ #toast{bottom:calc(env(safe-area-inset-bottom,0px) + 92px)}
+}
+@media (max-width:720px){
+ .stage{grid-template-columns:1fr 44px;row-gap:4px}.stage>span{grid-column:1/-1}.stage .bar{grid-column:1}
+ .uh .c{display:none}
+ .tools{position:static;padding:8px 0}.tools::before{display:none}
+ .tools .sw{flex:1 1 100%}.tools select{flex:1 1 calc(50% - 5px);min-width:0}.tools .btn{flex:1 1 calc(50% - 5px);min-height:44px}
+ .th{padding:10px 12px;font-size:.92rem}.th label{min-width:0}
+ .st td{width:clamp(38px,9vw,92px)}.st td:first-child{padding:8px 6px 8px 12px}
+ .st th{font-size:.54rem;letter-spacing:0;padding:8px 0}
+ input[type=checkbox]{width:22px;height:22px;border-radius:7px}
+ .tools select{flex:1 1 100%}
+ .tools .btn{flex:1 1 100%}
+ .rv tr:first-child{display:none}
+ .rv,.rv tbody,.rv tr,.rv td{display:block}
+ .rv tr{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:14px;border:1px solid var(--line);border-radius:14px;margin-bottom:12px;background:rgba(255,255,255,.04)}
+ .rv td{background:none;border:0!important;padding:0;text-align:left;border-radius:0!important}
+ .rv td:first-child{grid-column:1/-1;font-size:.95rem}
+ .rv td[data-label]::before{content:attr(data-label);display:block;font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:6px}
+ .rv td[data-label]{display:flex;flex-direction:column;align-items:flex-start}
+ .rv input[type=date]{min-width:0}
+ .cal{gap:4px}.day{border-radius:10px}
+}
+@media (max-width:374px){
+ .papers button{padding:7px 8px;font-size:.85rem}.papers button small{display:none}
+ .st th{font-size:.56rem;letter-spacing:0}.st td{width:40px}.st td:first-child{padding-left:8px}
+ .kpis{grid-template-columns:1fr 1fr}.chip{font-size:.76rem;padding:5px 10px}
+}
+@media (min-width:1600px){html{font-size:17px}}
+@media (prefers-reduced-motion:reduce){
+ *,*::before,*::after{animation:none!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+ .js .reveal{opacity:1!important;transform:none!important}
+}
+</style></head><body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><linearGradient id="rg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22D3EE"/><stop offset="1" stop-color="#A78BFA"/></linearGradient></defs></svg>
+<div class="ambient" aria-hidden="true"><i></i><i></i><i></i></div>
+<header class="topbar"><div class="tb-in">
+ <div class="brand"><span class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l9-5 9 5-9 5z"/><path d="M7 11.5V16c0 1.5 2.2 3 5 3s5-1.500 5-3v-4.5"/></svg></span><span>UGC NET</span></div>
+ <div class="papers" id="papers" role="group" aria-label="Choose paper"></div>
+ <nav class="tabs" aria-label="Sections">
+  <button class="on" data-tab="dash" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="2"/><rect x="14" y="3" width="7" height="5" rx="2"/><rect x="14" y="12" width="7" height="9" rx="2"/><rect x="3" y="16" width="7" height="5" rx="2"/></svg><span>Dashboard</span></button>
+  <button data-tab="syl" aria-current="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5"/><path d="M9 7h6"/></svg><span>Syllabus</span></button>
+  <button data-tab="rev" aria-current="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a3 3 0 0 1 3-3h15"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a3 3 0 0 1-3 3H3"/></svg><span>Revision</span></button>
+ </nav></div></header>
+<section class="hero"><span class="eyebrow">JRF Preparation Hub</span><h1>UGC NET Study Tracker</h1>
+<p id="heroSub"></p>
+<div class="chips" aria-live="polite"><span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><span id="cDays"></span></span><span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3c1 3 5 5 5 10a5 5 0 0 1-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3-1-6 1-9z"/></svg><span id="cStreak"></span></span><span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span id="cExam"></span></span><span class="chip"><i class="dot"></i><span id="saveState"></span></span></div></section>
+<main>
+<section class="tab on" id="t-dash" aria-label="Dashboard">
+ <div class="card a-cand"><h2>Candidate</h2><div class="grid" id="fields"></div></div>
+ <div class="card a-prog"><h2 id="progT">Progress summary</h2><div class="kpis" id="kpis"></div><div style="margin-top:18px" id="stages"></div></div>
+ <div class="card a-cal"><h2>Study calendar <span class="note" style="text-transform:none;letter-spacing:0">(both papers)</span></h2>
+  <div class="calhead"><button class="btn" id="prev" aria-label="Previous month">‹</button><b id="monthT" aria-live="polite"></b><button class="btn" id="next" aria-label="Next month">›</button></div>
+  <div class="cal" id="cal"></div>
+  <div class="legend">Less <i style="background:rgba(255,255,255,.03)"></i><i style="background:rgba(139,92,246,.2)"></i><i style="background:rgba(139,92,246,.38)"></i><i style="background:rgba(139,92,246,.62)"></i><i style="background:#8B5CF6"></i> More <span style="margin-left:8px;display:inline-flex;align-items:center;gap:6px"><i class="mk2"></i> marked manually</span></div>
+  <div class="detail" id="detail" aria-live="polite"></div>
+  <div class="cal-actions"><button class="btn pri" id="markToday">I studied today</button><button class="btn" id="markSel">Toggle selected day</button></div>
+  <p class="note" style="margin:10px 0 0">Days light up automatically whenever you tick a stage in either paper. Use the buttons to mark a day yourself.</p></div>
+ <div class="card a-rings"><h2>Units</h2><div class="rings" id="rings"></div></div>
+</section>
+
+<section class="tab" id="t-syl" aria-label="Syllabus">
+ <div class="tools"><div class="sw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><input type="text" id="q" placeholder="Search topics…" aria-label="Search topics"></div>
+  <select id="flt" aria-label="Filter"><option value="all">Show all</option><option value="s">Not yet studied</option><option value="n">Notes pending</option><option value="q">Practice pending</option><option value="v">Revision pending</option><option value="any">Anything ticked</option></select>
+  <button class="btn" id="toggleAll">Collapse all</button></div>
+ <div class="leg2"><span><i style="background:var(--cs);color:var(--cs)"></i>Studied</span><span><i style="background:var(--cn);color:var(--cn)"></i>Notes Made</span><span><i style="background:var(--cq);color:var(--cq)"></i>Practiced Questions</span><span><i style="background:var(--cv);color:var(--cv)"></i>Revised</span><span>Tap a column title to tick or untick a whole topic</span></div>
+ <div id="syl"></div>
+ <div class="empty hide" id="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/><path d="M8 11h6"/></svg><b>No matching topics</b>Try a different search or set the filter to “Show all”.</div>
+</section>
+
+<section class="tab" id="t-rev" aria-label="Revision">
+ <div class="card"><h2 id="revT">Revision tracker</h2><div id="revs"></div></div>
+ <div class="card"><h2>Backup</h2><div class="danger-zone"><button class="btn pri" id="exportBtn">Export my progress</button><button class="btn" id="importBtn">Import backup</button><input type="file" id="importFile" accept="application/json,.json" hidden></div>
+  <p class="note" style="margin:10px 0 0">Progress is stored in this browser only. Export a backup file now and then, and import it to restore your data or continue on another device.</p></div>
+ <div class="card"><h2>Reset</h2><div class="danger-zone"><button class="btn danger" id="resetP">Reset this paper</button><button class="btn danger" id="resetAll">Reset everything</button></div>
+  <p class="note" style="margin:10px 0 0">“Reset this paper” clears ticks and revision data for the paper you are viewing. “Reset everything” also clears both papers’ calendar days and your candidate fields. You will be asked to confirm.</p></div>
+</section>
+</main>
+<footer class="foot">Your progress saves automatically in this browser. Use Export on the Revision tab to back it up or move it to another device.</footer>
+<div id="toast" role="status" aria-live="polite"></div>
+<script>document.documentElement.classList.add('js');
+
+const PAPERS=[{"id":1,"pfx":"p1","roman":"Paper I","pill":"Paper I","title":"General Paper on Teaching & Research Aptitude","short":"Teaching & Research Aptitude","code":"00","units":[{"n":1,"name":"Teaching Aptitude","topics":[{"name":"Teaching: Concept, Objectives, Levels of teaching, Characteristics and basic requirements","items":[{"t":"Concept"},{"t":"Objectives"},{"t":"Levels of teaching","c":["Memory","Understanding","Reflective"]},{"t":"Characteristics"},{"t":"Basic requirements"}]},{"name":"Learner’s characteristics","items":[{"t":"Characteristics of adolescent and adult learners","c":["Academic","Social","Emotional","Cognitive"]},{"t":"Individual differences"}]},{"name":"Factors affecting teaching related to","items":[{"t":"Teacher"},{"t":"Learner"},{"t":"Support material"},{"t":"Instructional facilities"},{"t":"Learning environment"},{"t":"Institution"}]},{"name":"Methods of teaching in Institutions of higher learning","items":[{"t":"Teacher centred vs. Learner centred methods"},{"t":"Off-line vs. On-line methods","c":["Swayam","Swayamprabha","MOOCs etc."]}]},{"name":"Teaching Support System","items":[{"t":"Traditional"},{"t":"Modern"},{"t":"ICT based"}]},{"name":"Evaluation Systems","items":[{"t":"Elements of evaluation"},{"t":"Types of evaluation"},{"t":"Evaluation in Choice Based Credit System in Higher education"},{"t":"Computer based testing"},{"t":"Innovations in evaluation systems"}]}]},{"n":2,"name":"Research Aptitude","topics":[{"name":"Research: Meaning, Types, and Characteristics","items":[{"t":"Meaning"},{"t":"Types"},{"t":"Characteristics"},{"t":"Positivism and Postpositivistic approach to research"}]},{"name":"Methods of Research","items":[{"t":"Experimental"},{"t":"Descriptive"},{"t":"Historical"},{"t":"Qualitative methods"},{"t":"Quantitative methods"}]},{"name":"Steps of Research","items":[{"t":"Steps of Research"}]},{"name":"Thesis and Article writing","items":[{"t":"Format"},{"t":"Styles of referencing"}]},{"name":"Application of ICT in research","items":[{"t":"Application of ICT in research"}]},{"name":"Research ethics","items":[{"t":"Research ethics"}]}]},{"n":3,"name":"Comprehension","topics":[{"name":"Comprehension","items":[{"t":"A passage of text be given"},{"t":"Questions be asked from the passage to be answered"}]}]},{"n":4,"name":"Communication","topics":[{"name":"Communication: Meaning, types and characteristics of communication","items":[{"t":"Meaning"},{"t":"Types"},{"t":"Characteristics"}]},{"name":"Effective communication","items":[{"t":"Verbal and Non-verbal"},{"t":"Inter-Cultural and group communications"},{"t":"Classroom communication"}]},{"name":"Barriers to effective communication","items":[{"t":"Barriers to effective communication"}]},{"name":"Mass-Media and Society","items":[{"t":"Mass-Media and Society"}]}]},{"n":5,"name":"Mathematical Reasoning and Aptitude","topics":[{"name":"Types of reasoning","items":[{"t":"Types of reasoning"}]},{"name":"Number series, Letter series, Codes and Relationships","items":[{"t":"Number series"},{"t":"Letter series"},{"t":"Codes and Relationships"}]},{"name":"Mathematical Aptitude","items":[{"t":"Fraction"},{"t":"Time & Distance"},{"t":"Ratio, Proportion and Percentage"},{"t":"Profit and Loss"},{"t":"Interest and Discounting"},{"t":"Averages etc."}]}]},{"n":6,"name":"Logical Reasoning","topics":[{"name":"Understanding the structure of arguments","items":[{"t":"Argument forms"},{"t":"Structure of categorical propositions"},{"t":"Mood and Figure"},{"t":"Formal and Informal fallacies"},{"t":"Uses of language"},{"t":"Connotations and denotations of terms"},{"t":"Classical square of opposition"}]},{"name":"Evaluating and distinguishing deductive and inductive reasoning","items":[{"t":"Evaluating and distinguishing deductive and inductive reasoning"}]},{"name":"Analogies","items":[{"t":"Analogies"}]},{"name":"Venn diagram","items":[{"t":"Simple and multiple use for establishing validity of arguments"}]},{"name":"Indian Logic: Means of knowledge","items":[{"t":"Indian Logic: Means of knowledge"}]},{"name":"Pramanas","items":[{"t":"Pratyaksha (Perception)"},{"t":"Anumana (Inference)"},{"t":"Upamana (Comparison)"},{"t":"Shabda (Verbal testimony)"},{"t":"Arthapatti (Implication)"},{"t":"Anupalabddhi (Non-apprehension)"}]},{"name":"Structure and kinds of Anumana (inference), Vyapti, Hetvabhasas","items":[{"t":"Structure and kinds of Anumana (inference)"},{"t":"Vyapti (invariable relation)"},{"t":"Hetvabhasas (fallacies of inference)"}]}]},{"n":7,"name":"Data Interpretation","topics":[{"name":"Sources, acquisition and classification of Data","items":[{"t":"Sources of Data"},{"t":"Acquisition of Data"},{"t":"Classification of Data"}]},{"name":"Quantitative and Qualitative Data","items":[{"t":"Quantitative Data"},{"t":"Qualitative Data"}]},{"name":"Graphical representation and mapping of Data","items":[{"t":"Bar-chart"},{"t":"Histograms"},{"t":"Pie-chart"},{"t":"Table-chart"},{"t":"Line-chart"},{"t":"Mapping of Data"}]},{"name":"Data Interpretation","items":[{"t":"Data Interpretation"}]},{"name":"Data and Governance","items":[{"t":"Data and Governance"}]}]},{"n":8,"name":"Information and Communication Technology (ICT)","topics":[{"name":"ICT: General abbreviations and terminology","items":[{"t":"ICT: General abbreviations and terminology"}]},{"name":"Basics of Internet, Intranet, E-mail, Audio and Video-conferencing","items":[{"t":"Internet"},{"t":"Intranet"},{"t":"E-mail"},{"t":"Audio and Video-conferencing"}]},{"name":"Digital initiatives in higher education","items":[{"t":"Digital initiatives in higher education"}]},{"name":"ICT and Governance","items":[{"t":"ICT and Governance"}]}]},{"n":9,"name":"People, Development and Environment","topics":[{"name":"Development and environment","items":[{"t":"Millennium development goals"},{"t":"Sustainable development goals"}]},{"name":"Human and environment interaction","items":[{"t":"Anthropogenic activities and their impacts on environment"}]},{"name":"Environmental issues: Local, Regional and Global","items":[{"t":"Air pollution"},{"t":"Water pollution"},{"t":"Soil pollution"},{"t":"Noise pollution"},{"t":"Waste","c":["Solid","Liquid","Biomedical","Hazardous","Electronic"]},{"t":"Climate change and its Socio-Economic and Political dimensions"}]},{"name":"Impacts of pollutants on human health","items":[{"t":"Impacts of pollutants on human health"}]},{"name":"Natural and energy resources","items":[{"t":"Solar"},{"t":"Wind"},{"t":"Soil"},{"t":"Hydro"},{"t":"Geothermal"},{"t":"Biomass"},{"t":"Nuclear"},{"t":"Forests"}]},{"name":"Natural hazards and disasters","items":[{"t":"Mitigation strategies"}]},{"name":"Environmental Protection Act (1986), National Action Plan on Climate Change, International agreements/efforts","items":[{"t":"Environmental Protection Act (1986)"},{"t":"National Action Plan on Climate Change"},{"t":"Montreal Protocol"},{"t":"Rio Summit"},{"t":"Convention on Biodiversity"},{"t":"Kyoto Protocol"},{"t":"Paris Agreement"},{"t":"International Solar Alliance"}]}]},{"n":10,"name":"Higher Education System","topics":[{"name":"Institutions of higher learning and education in ancient India","items":[{"t":"Institutions of higher learning and education in ancient India"}]},{"name":"Evolution of higher learning and research in Post Independence India","items":[{"t":"Evolution of higher learning and research in Post Independence India"}]},{"name":"Oriental, Conventional and Non-conventional learning programmes in India","items":[{"t":"Oriental, Conventional and Non-conventional learning programmes in India"}]},{"name":"Professional, Technical and Skill Based education","items":[{"t":"Professional, Technical and Skill Based education"}]},{"name":"Value education and environmental education","items":[{"t":"Value education"},{"t":"Environmental education"}]},{"name":"Policies, Governance, and Administration","items":[{"t":"Policies"},{"t":"Governance"},{"t":"Administration"}]}]}]},{"id":2,"pfx":"cs","roman":"Paper II","pill":"Paper II · CS","title":"Computer Science & Applications","short":"Computer Science & Applications","code":"87","units":[{"n":1,"name":"Discrete Structures and Optimization","topics":[{"name":"Mathematical Logic","items":[{"t":"Propositional Logic"},{"t":"Predicate Logic"},{"t":"Propositional Equivalences"},{"t":"Normal Forms"},{"t":"Predicates and Quantifiers"},{"t":"Nested Quantifiers"},{"t":"Rules of Inference"}]},{"name":"Sets and Relations","items":[{"t":"Set Operations"},{"t":"Representation of Relations"},{"t":"Properties of Relations"},{"t":"Equivalence Relations"},{"t":"Partially Ordering"}]},{"name":"Counting, Mathematical Induction and Discrete Probability","items":[{"t":"Basics of Counting"},{"t":"Pigeonhole Principle"},{"t":"Permutations and Combinations"},{"t":"Inclusion-Exclusion Principle"},{"t":"Mathematical Induction"},{"t":"Probability"},{"t":"Bayes’ Theorem"}]},{"name":"Group Theory","items":[{"t":"Groups"},{"t":"Subgroups"},{"t":"Semi Groups"},{"t":"Product and Quotients of Algebraic Structures"},{"t":"Isomorphism"},{"t":"Homomorphism"},{"t":"Automorphism"},{"t":"Rings"},{"t":"Integral Domains"},{"t":"Fields"},{"t":"Applications of Group Theory"}]},{"name":"Graph Theory","items":[{"t":"Simple Graph"},{"t":"Multigraph"},{"t":"Weighted Graph"},{"t":"Paths and Circuits"},{"t":"Shortest Paths in Weighted Graphs"},{"t":"Eulerian Paths and Circuits"},{"t":"Hamiltonian Paths and Circuits"},{"t":"Planner graph"},{"t":"Graph Coloring"},{"t":"Bipartite Graphs"},{"t":"Trees and Rooted Trees"},{"t":"Prefix Codes"},{"t":"Tree Traversals"},{"t":"Spanning Trees and Cut-Sets"}]},{"name":"Boolean Algebra","items":[{"t":"Boolean Functions and its Representation"},{"t":"Simplifications of Boolean Functions"}]},{"name":"Optimization","items":[{"t":"Linear Programming","c":["Mathematical Model","Graphical Solution","Simplex and Dual Simplex Method","Sensitive Analysis"]},{"t":"Integer Programming"},{"t":"Transportation Models"},{"t":"Assignment Models"},{"t":"PERT-CPM","c":["Diagram Representation","Critical Path Calculations","Resource Levelling","Cost Consideration in Project Scheduling"]}]}]},{"n":2,"name":"Computer System Architecture","topics":[{"name":"Digital Logic Circuits and Components","items":[{"t":"Digital Computers"},{"t":"Logic Gates"},{"t":"Boolean Algebra"},{"t":"Map Simplifications"},{"t":"Combinational Circuits"},{"t":"Flip-Flops"},{"t":"Sequential Circuits"},{"t":"Integrated Circuits"},{"t":"Decoders"},{"t":"Multiplexers"},{"t":"Registers and Counters"},{"t":"Memory Unit"}]},{"name":"Data Representation","items":[{"t":"Data Types"},{"t":"Number Systems and Conversion"},{"t":"Complements"},{"t":"Fixed Point Representation"},{"t":"Floating Point Representation"},{"t":"Error Detection Codes"},{"t":"Computer Arithmetic","c":["Addition Algorithms","Subtraction Algorithms","Multiplication Algorithms","Division Algorithms"]}]},{"name":"Register Transfer and Microoperations","items":[{"t":"Register Transfer Language"},{"t":"Bus and Memory Transfers"},{"t":"Arithmetic Microoperations"},{"t":"Logic Microoperations"},{"t":"Shift Microoperations"}]},{"name":"Basic Computer Organization and Design","items":[{"t":"Stored Program Organization and Instruction Codes"},{"t":"Computer Registers"},{"t":"Computer Instructions"},{"t":"Timing and Control"},{"t":"Instruction Cycle"},{"t":"Memory-Reference Instructions"},{"t":"Input-Output"},{"t":"Interrupt"}]},{"name":"Programming the Basic Computer","items":[{"t":"Machine Language"},{"t":"Assembly Language"},{"t":"Assembler"},{"t":"Program Loops"},{"t":"Subroutines"},{"t":"Input-Output Programming"}]},{"name":"Microprogrammed Control","items":[{"t":"Control Memory"},{"t":"Address Sequencing"},{"t":"Design of Control Unit"}]},{"name":"Central Processing Unit","items":[{"t":"General Register Organization"},{"t":"Stack Organization"},{"t":"Instruction Formats"},{"t":"Addressing Modes"},{"t":"RISC Computer"},{"t":"CISC Computer"}]},{"name":"Pipeline and Vector Processing","items":[{"t":"Parallel Processing"},{"t":"Pipelining"},{"t":"Arithmetic Pipeline"},{"t":"Instruction Pipeline"},{"t":"Vector Processing"},{"t":"Array Processors"}]},{"name":"Input-Output Organization","items":[{"t":"Peripheral Devices"},{"t":"Input-Output Interface"},{"t":"Asynchronous Data Transfer"},{"t":"Modes of Transfer"},{"t":"Priority Interrupt"},{"t":"DMA"},{"t":"Serial Communication"}]},{"name":"Memory Hierarchy","items":[{"t":"Main Memory"},{"t":"Auxillary Memory"},{"t":"Associative Memory"},{"t":"Cache Memory"},{"t":"Virtual Memory"},{"t":"Memory Management Hardware"}]},{"name":"Multiprocessors","items":[{"t":"Characteristics of Multiprocessors"},{"t":"Interconnection Structures"},{"t":"Interprocessor Arbitration"},{"t":"Interprocessor Communication and Synchronization"},{"t":"Cache Coherence"},{"t":"Multicore Processors"}]}]},{"n":3,"name":"Programming Languages and Computer Graphics","topics":[{"name":"Language Design and Translation Issues","items":[{"t":"Programming Language Concepts"},{"t":"Paradigms and Models"},{"t":"Programming Environments"},{"t":"Virtual Computers and Binding Times"},{"t":"Programming Language Syntax"},{"t":"Stages in Translation"},{"t":"Formal Transition Models"}]},{"name":"Elementary Data Types","items":[{"t":"Properties of Types and Objects"},{"t":"Scalar Data Types"},{"t":"Composite Data Types"}]},{"name":"Programming in C","items":[{"t":"Tokens"},{"t":"Identifiers"},{"t":"Data Types"},{"t":"Sequence Control"},{"t":"Subprogram Control"},{"t":"Arrays"},{"t":"Structures"},{"t":"Union"},{"t":"String"},{"t":"Pointers"},{"t":"Functions"},{"t":"File Handling"},{"t":"Command Line Arguments"},{"t":"Preprocessors"}]},{"name":"Object Oriented Programming","items":[{"t":"Class"},{"t":"Object"},{"t":"Instantiation"},{"t":"Inheritance"},{"t":"Encapsulation"},{"t":"Abstract Class"},{"t":"Polymorphism"}]},{"name":"Programming in C++","items":[{"t":"Tokens"},{"t":"Identifiers"},{"t":"Variables and Constants"},{"t":"Data types"},{"t":"Operators"},{"t":"Control statements"},{"t":"Functions Parameter Passing"},{"t":"Virtual Functions"},{"t":"Class and Objects"},{"t":"Constructors and Destructors"},{"t":"Overloading"},{"t":"Inheritance"},{"t":"Templates"},{"t":"Exception and Event Handling"},{"t":"Streams and Files"},{"t":"Multifile Programs"}]},{"name":"Web Programming","items":[{"t":"HTML"},{"t":"DHTML"},{"t":"XML"},{"t":"Scripting"},{"t":"Java"},{"t":"Servlets"},{"t":"Applets"}]},{"name":"Computer Graphics","items":[{"t":"Video-Display Devices"},{"t":"Raster-Scan and Random-Scan Systems"},{"t":"Graphics Monitors"},{"t":"Input Devices"},{"t":"Points and Lines"},{"t":"Line Drawing Algorithms"},{"t":"Mid-Point Circle and Ellipse Algorithms"},{"t":"Scan Line Polygon Fill Algorithm"},{"t":"Boundary-Fill and Flood-Fill"}]},{"name":"2-D Geometrical Transforms and Viewing","items":[{"t":"Translation"},{"t":"Scaling"},{"t":"Rotation"},{"t":"Reflection"},{"t":"Shear Transformations"},{"t":"Matrix Representations and Homogeneous Coordinates"},{"t":"Composite Transforms"},{"t":"Transformations Between Coordinate Systems"},{"t":"Viewing Pipeline"},{"t":"Viewing Coordinate Reference Frame"},{"t":"Window to View-Port Coordinate Transformation"},{"t":"Viewing Functions"},{"t":"Line and Polygon Clipping Algorithms"}]},{"name":"3-D Object Representation, Geometric Transformations and Viewing","items":[{"t":"Polygon Surfaces"},{"t":"Quadric Surfaces"},{"t":"Spline Representation"},{"t":"Bezier and B-Spline Curves"},{"t":"Bezier and B-Spline Surfaces"},{"t":"Illumination Models"},{"t":"Polygon Rendering Methods"},{"t":"Viewing Pipeline and Coordinates"},{"t":"General Projection Transforms and Clipping"}]}]},{"n":4,"name":"Database Management Systems","topics":[{"name":"Database System Concepts and Architecture","items":[{"t":"Data Models, Schemas, and Instances"},{"t":"Three-Schema Architecture and Data Independence"},{"t":"Database Languages and Interfaces"},{"t":"Centralized and Client/Server Architectures for DBMS"}]},{"name":"Data Modeling","items":[{"t":"Entity-Relationship Diagram"},{"t":"Relational Model","c":["Constraints","Languages","Design","Programming"]},{"t":"Relational Database Schemas"},{"t":"Update Operations and Dealing with Constraint Violations"},{"t":"Relational Algebra"},{"t":"Relational Calculus"},{"t":"Codd Rules"}]},{"name":"SQL","items":[{"t":"Data Definition and Data Types"},{"t":"Constraints"},{"t":"Queries"},{"t":"Insert, Delete, and Update Statements"},{"t":"Views"},{"t":"Stored Procedures and Functions"},{"t":"Database Triggers"},{"t":"SQL Injection"}]},{"name":"Normalization for Relational Databases","items":[{"t":"Functional Dependencies and Normalization"},{"t":"Algorithms for Query Processing and Optimization"},{"t":"Transaction Processing"},{"t":"Concurrency Control Techniques"},{"t":"Database Recovery Techniques"},{"t":"Object and Object-Relational Databases"},{"t":"Database Security and Authorization"}]},{"name":"Enhanced Data Models","items":[{"t":"Temporal Database Concepts"},{"t":"Multimedia Databases"},{"t":"Deductive Databases"},{"t":"XML and Internet Databases"},{"t":"Mobile Databases"},{"t":"Geographic Information Systems"},{"t":"Genome Data Management"},{"t":"Distributed Databases and Client-Server Architectures"}]},{"name":"Data Warehousing and Data Mining","items":[{"t":"Data Modeling for Data Warehouses"},{"t":"Concept Hierarchy"},{"t":"OLAP and OLTP"},{"t":"Association Rules"},{"t":"Classification"},{"t":"Clustering"},{"t":"Regression"},{"t":"Support Vector Machine"},{"t":"K-Nearest Neighbour"},{"t":"Hidden Markov Model"},{"t":"Summarization"},{"t":"Dependency Modeling"},{"t":"Link Analysis"},{"t":"Sequencing Analysis"},{"t":"Social Network Analysis"}]},{"name":"Big Data Systems","items":[{"t":"Big Data Characteristics"},{"t":"Types of Big Data"},{"t":"Big Data Architecture"},{"t":"Introduction to Map-Reduce and Hadoop"},{"t":"Distributed File System"},{"t":"HDFS"}]},{"name":"NOSQL","items":[{"t":"NOSQL and Query Optimization"},{"t":"Different NOSQL Products"},{"t":"Querying and Managing NOSQL"},{"t":"Indexing and Ordering Data Sets"},{"t":"NOSQL in Cloud"}]}]},{"n":5,"name":"System Software and Operating System","topics":[{"name":"System Software","items":[{"t":"Machine, Assembly and High-Level Languages"},{"t":"Compilers and Interpreters"},{"t":"Loading, Linking and Relocation"},{"t":"Macros"},{"t":"Debuggers"}]},{"name":"Basics of Operating Systems","items":[{"t":"Operating System Structure"},{"t":"Operations and Services"},{"t":"System Calls"},{"t":"Operating-System Design and Implementation"},{"t":"System Boot"}]},{"name":"Process Management","items":[{"t":"Process Scheduling and Operations"},{"t":"Interprocess Communication"},{"t":"Communication in Client–Server Systems"},{"t":"Process Synchronization"},{"t":"Critical-Section Problem"},{"t":"Peterson’s Solution"},{"t":"Semaphores"},{"t":"Synchronization"}]},{"name":"Threads","items":[{"t":"Multicore Programming"},{"t":"Multithreading Models"},{"t":"Thread Libraries"},{"t":"Implicit Threading"},{"t":"Threading Issues"}]},{"name":"CPU Scheduling","items":[{"t":"Scheduling Criteria and Algorithms"},{"t":"Thread Scheduling"},{"t":"Multiple-Processor Scheduling"},{"t":"Real-Time CPU Scheduling"}]},{"name":"Deadlocks","items":[{"t":"Deadlock Characterization"},{"t":"Methods for Handling Deadlocks"},{"t":"Deadlock Prevention"},{"t":"Deadlock Avoidance"},{"t":"Deadlock Detection"},{"t":"Recovery from Deadlock"}]},{"name":"Memory Management","items":[{"t":"Contiguous Memory Allocation"},{"t":"Swapping"},{"t":"Paging"},{"t":"Segmentation"},{"t":"Demand Paging"},{"t":"Page Replacement"},{"t":"Allocation of Frames"},{"t":"Thrashing"},{"t":"Memory-Mapped Files"}]},{"name":"Storage Management","items":[{"t":"Mass-Storage Structure"},{"t":"Disk Structure"},{"t":"Disk Scheduling and Management"},{"t":"RAID Structure"}]},{"name":"File and Input/Output Systems","items":[{"t":"Access Methods"},{"t":"Directory and Disk Structure"},{"t":"File-System Mounting"},{"t":"File Sharing"},{"t":"File-System Structure and Implementation"},{"t":"Directory Implementation"},{"t":"Allocation Methods"},{"t":"Free-Space Management"},{"t":"Efficiency and Performance"},{"t":"Recovery"},{"t":"I/O Hardware"},{"t":"Application I/O Interface"},{"t":"Kernel I/O Subsystem"},{"t":"Transforming I/O Requests to Hardware Operations"}]},{"name":"Security","items":[{"t":"Protection"},{"t":"Access Matrix"},{"t":"Access Control"},{"t":"Revocation of Access Rights"},{"t":"Program Threats"},{"t":"System and Network Threats"},{"t":"Cryptography as a Security Tool"},{"t":"User Authentication"},{"t":"Implementing Security Defenses"}]},{"name":"Virtual Machines","items":[{"t":"Types of Virtual Machines and Implementations"},{"t":"Virtualization"}]},{"name":"Linux Operating Systems","items":[{"t":"Design Principles"},{"t":"Kernel Modules"},{"t":"Process Management"},{"t":"Scheduling"},{"t":"Memory Management"},{"t":"File Systems"},{"t":"Input and Output"},{"t":"Interprocess Communication"},{"t":"Network Structure"}]},{"name":"Windows Operating Systems","items":[{"t":"Design Principles"},{"t":"System Components"},{"t":"Terminal Services and Fast User Switching"},{"t":"File System"},{"t":"Networking"}]},{"name":"Distributed Systems","items":[{"t":"Types of Network based Operating Systems"},{"t":"Network Structure"},{"t":"Communication Structure and Protocols"},{"t":"Robustness"},{"t":"Design Issues"},{"t":"Distributed File Systems"}]}]},{"n":6,"name":"Software Engineering","topics":[{"name":"Software Process Models","items":[{"t":"Software Process"},{"t":"Generic Process Model","c":["Framework Activity","Task Set","Process Patterns"]},{"t":"Process Lifecycle"},{"t":"Prescriptive Process Models"},{"t":"Project Management"},{"t":"Component Based Development"},{"t":"Aspect-Oriented Software Development"},{"t":"Formal Methods"},{"t":"Agile Process Models","c":["Extreme Programming (XP)","Adaptive Software Development","Scrum","Dynamic System Development Model","Feature Driven Development","Crystal"]},{"t":"Web Engineering"}]},{"name":"Software Requirements","items":[{"t":"Functional and Non-Functional Requirements"},{"t":"Eliciting Requirements"},{"t":"Developing Use Cases"},{"t":"Requirement Analysis and Modelling"},{"t":"Requirements Review"},{"t":"Software Requirement and Specification (SRS) Document"}]},{"name":"Software Design","items":[{"t":"Abstraction"},{"t":"Architecture"},{"t":"Patterns"},{"t":"Separation of Concerns"},{"t":"Modularity"},{"t":"Information Hiding"},{"t":"Functional Independence"},{"t":"Cohesion and Coupling"},{"t":"Object-Oriented Design"},{"t":"Data Design"},{"t":"Architectural Design"},{"t":"User Interface Design"},{"t":"Component Level Design"}]},{"name":"Software Quality","items":[{"t":"McCall’s Quality Factors"},{"t":"ISO 9126 Quality Factors"},{"t":"Quality Control"},{"t":"Quality Assurance"},{"t":"Risk Management"},{"t":"Risk Mitigation, Monitoring and Management (RMMM)"},{"t":"Software Reliability"}]},{"name":"Estimation and Scheduling of Software Projects","items":[{"t":"Software Sizing"},{"t":"LOC and FP based Estimations"},{"t":"Estimating Cost and Effort"},{"t":"Estimation Models"},{"t":"Constructive Cost Model (COCOMO)"},{"t":"Project Scheduling and Staffing"},{"t":"Time-line Charts"}]},{"name":"Software Testing","items":[{"t":"Verification and Validation"},{"t":"Error, Fault, Bug and Failure"},{"t":"Unit and Integration Testing"},{"t":"White-box and Black-box Testing"},{"t":"Basis Path Testing"},{"t":"Control Structure Testing"},{"t":"Deriving Test Cases"},{"t":"Alpha and Beta Testing"},{"t":"Regression Testing"},{"t":"Performance Testing"},{"t":"Stress Testing"}]},{"name":"Software Configuration Management","items":[{"t":"Change Control and Version Control"},{"t":"Software Reuse"},{"t":"Software Re-engineering"},{"t":"Reverse Engineering"}]}]},{"n":7,"name":"Data Structures and Algorithms","topics":[{"name":"Data Structures","items":[{"t":"Arrays and their Applications"},{"t":"Sparse Matrix"},{"t":"Stacks"},{"t":"Queues"},{"t":"Priority Queues"},{"t":"Linked Lists"},{"t":"Trees"},{"t":"Forest"},{"t":"Binary Tree"},{"t":"Threaded Binary Tree"},{"t":"Binary Search Tree"},{"t":"AVL Tree"},{"t":"B Tree"},{"t":"B+ Tree"},{"t":"B* Tree"},{"t":"Data Structure for Sets"},{"t":"Graphs"},{"t":"Sorting and Searching Algorithms"},{"t":"Hashing"}]},{"name":"Performance Analysis of Algorithms and Recurrences","items":[{"t":"Time and Space Complexities"},{"t":"Asymptotic Notation"},{"t":"Recurrence Relations"}]},{"name":"Design Techniques","items":[{"t":"Divide and Conquer"},{"t":"Dynamic Programming"},{"t":"Greedy Algorithms"},{"t":"Backtracking"},{"t":"Branch and Bound"}]},{"name":"Lower Bound Theory","items":[{"t":"Comparison Trees"},{"t":"Lower Bounds through Reductions"}]},{"name":"Graph Algorithms","items":[{"t":"Breadth-First Search"},{"t":"Depth-First Search"},{"t":"Shortest Paths"},{"t":"Maximum Flow"},{"t":"Minimum Spanning Trees"}]},{"name":"Complexity Theory","items":[{"t":"P and NP Class Problems"},{"t":"NP-completeness and Reducibility"}]},{"name":"Selected Topics","items":[{"t":"Number Theoretic Algorithms"},{"t":"Polynomial Arithmetic"},{"t":"Fast Fourier Transform"},{"t":"String Matching Algorithms"}]},{"name":"Advanced Algorithms","items":[{"t":"Parallel Algorithms for Sorting, Searching and Merging"},{"t":"Approximation Algorithms"},{"t":"Randomized Algorithms"}]}]},{"n":8,"name":"Theory of Computation and Compilers","topics":[{"name":"Theory of Computation","items":[{"t":"Formal Language"},{"t":"Non-Computational Problems"},{"t":"Diagonal Argument"},{"t":"Russell’s Paradox"}]},{"name":"Regular Language Models","items":[{"t":"Deterministic Finite Automaton (DFA)"},{"t":"Non-Deterministic Finite Automaton (NDFA)"},{"t":"Equivalence of DFA and NDFA"},{"t":"Regular Languages"},{"t":"Regular Grammars"},{"t":"Regular Expressions"},{"t":"Properties of Regular Language"},{"t":"Pumping Lemma"},{"t":"Non-Regular Languages"},{"t":"Lexical Analysis"}]},{"name":"Context Free Language","items":[{"t":"Pushdown Automaton (PDA)"},{"t":"Non-Deterministic Pushdown Automaton (NPDA)"},{"t":"Context Free Grammar"},{"t":"Chomsky Normal Form"},{"t":"Greibach Normal Form"},{"t":"Ambiguity"},{"t":"Parse Tree Representation of Derivation Trees"},{"t":"Equivalence of PDA’s and Context Free Grammars"},{"t":"Properties of Context Free Language"}]},{"name":"Turing Machines (TM)","items":[{"t":"Standard Turing Machine and its Variations"},{"t":"Universal Turing Machines"},{"t":"Models of Computation and Church-Turing Thesis"},{"t":"Recursive and Recursively-Enumerable Languages"},{"t":"Context-Sensitive Languages"},{"t":"Unrestricted Grammars"},{"t":"Chomsky Hierarchy of Languages"},{"t":"Construction of TM for Simple Problems"}]},{"name":"Unsolvable Problems and Computational Complexity","items":[{"t":"Unsolvable Problem"},{"t":"Halting Problem"},{"t":"Post Correspondence Problem"},{"t":"Unsolvable Problems for Context-Free Languages"},{"t":"Measuring and Classifying Complexity"},{"t":"Tractable and Intractable Problems"}]},{"name":"Syntax Analysis","items":[{"t":"Associativity"},{"t":"Precedence"},{"t":"Grammar Transformations"},{"t":"Top Down Parsing"},{"t":"Recursive Descent Predictive Parsing"},{"t":"LL(1) Parsing"},{"t":"Bottom up Parsing"},{"t":"LR Parser"},{"t":"LALR(1) Parser"}]},{"name":"Semantic Analysis","items":[{"t":"Attribute Grammar"},{"t":"Syntax Directed Definitions"},{"t":"Inherited and Synthesized Attributes"},{"t":"Dependency Graph"},{"t":"Evaluation Order"},{"t":"S-attributed and L-attributed Definitions"},{"t":"Type-Checking"}]},{"name":"Run Time System","items":[{"t":"Storage Organization"},{"t":"Activation Tree"},{"t":"Activation Record"},{"t":"Stack Allocation of Activation Records"},{"t":"Parameter Passing Mechanisms"},{"t":"Symbol Table"}]},{"name":"Intermediate Code Generation","items":[{"t":"Intermediate Representations"},{"t":"Translation of Declarations"},{"t":"Translation of Assignments"},{"t":"Translation of Control Flow"},{"t":"Translation of Boolean Expressions"},{"t":"Translation of Procedure Calls"}]},{"name":"Code Generation and Code Optimization","items":[{"t":"Control-flow"},{"t":"Data-flow Analysis"},{"t":"Local Optimization"},{"t":"Global Optimization"},{"t":"Loop Optimization"},{"t":"Peep-Hole Optimization"},{"t":"Instruction Scheduling"}]}]},{"n":9,"name":"Data Communication and Computer Networks","topics":[{"name":"Data Communication","items":[{"t":"Components of a Data Communication System"},{"t":"Simplex, Half-Duplex and Duplex Modes of Communication"},{"t":"Analog and Digital Signals"},{"t":"Noiseless and Noisy Channels"},{"t":"Bandwidth, Throughput and Latency"},{"t":"Digital and Analog Transmission"},{"t":"Data Encoding and Modulation Techniques"},{"t":"Broadband and Baseband Transmission"},{"t":"Multiplexing"},{"t":"Transmission Media"},{"t":"Transmission Errors"},{"t":"Error Handling Mechanisms"}]},{"name":"Computer Networks","items":[{"t":"Network Topologies"},{"t":"Local Area Networks"},{"t":"Metropolitan Area Networks"},{"t":"Wide Area Network"},{"t":"Wireless Networks"},{"t":"Internet"}]},{"name":"Network Models","items":[{"t":"Layered Architecture"},{"t":"OSI Reference Model and its Protocols"},{"t":"TCP/IP Protocol Suite"},{"t":"Physical, Logical, Port and Specific Addresses"},{"t":"Switching Techniques"}]},{"name":"Functions of OSI and TCP/IP Layers","items":[{"t":"Framing"},{"t":"Error Detection and Correction"},{"t":"Flow and Error Control"},{"t":"Sliding Window Protocol"},{"t":"HDLC"},{"t":"Multiple Access","c":["CSMA/CD","CSMA/CA","Reservation","Polling","Token Passing","FDMA","CDMA","TDMA"]},{"t":"Network Devices"},{"t":"Backbone Networks"},{"t":"Virtual LANs"}]},{"name":"IPv4 Structure and Address Space (group heading not given in syllabus)","items":[{"t":"IPv4 Structure and Address Space"},{"t":"Classful and Classless Addressing"},{"t":"Datagram, Fragmentation and Checksum"},{"t":"IPv6 Packet Format"},{"t":"Mapping Logical to Physical Address (ARP)"},{"t":"Direct and Indirect Network Layer Delivery"},{"t":"Routing Algorithms"},{"t":"TCP, UDP and SCTP Protocols"},{"t":"Flow Control, Error Control and Congestion Control in TCP and SCTP"}]},{"name":"World Wide Web (WWW)","items":[{"t":"Uniform Resource Locator (URL)"},{"t":"Domain Name Service (DNS)"},{"t":"Resolution - Mapping Names to Addresses and Addresses to Names"},{"t":"Electronic Mail Architecture"},{"t":"SMTP, POP and IMAP"},{"t":"TELNET and FTP"}]},{"name":"Network Security","items":[{"t":"Malwares"},{"t":"Cryptography and Steganography"},{"t":"Secret-Key Algorithms"},{"t":"Public-Key Algorithms"},{"t":"Digital Signature"},{"t":"Virtual Private Networks"},{"t":"Firewalls"}]},{"name":"Mobile Technology","items":[{"t":"GSM and CDMA"},{"t":"Services and Architecture of GSM and Mobile Computing"},{"t":"Middleware and Gateway for Mobile Computing"},{"t":"Mobile IP and Mobile Communication Protocol"},{"t":"Communication Satellites"},{"t":"Wireless Networks and Topologies"},{"t":"Cellular Topology"},{"t":"Mobile Adhoc Networks"},{"t":"Wireless Transmission and Wireless LANs"},{"t":"Wireless Geolocation Systems"},{"t":"GPRS and SMS"}]},{"name":"Cloud Computing and IoT","items":[{"t":"SaaS"},{"t":"PaaS"},{"t":"IaaS"},{"t":"Public and Private Cloud"},{"t":"Virtualization"},{"t":"Virtual Server"},{"t":"Cloud Storage"},{"t":"Database Storage"},{"t":"Resource Management"},{"t":"Service Level Agreement"},{"t":"Basics of IoT"}]}]},{"n":10,"name":"Artificial Intelligence","topics":[{"name":"Approaches to AI","items":[{"t":"Turing Test and Rational Agent Approaches"},{"t":"State Space Representation of Problems"},{"t":"Heuristic Search Techniques"},{"t":"Game Playing"},{"t":"Min-Max Search"},{"t":"Alpha Beta Cutoff Procedures"}]},{"name":"Knowledge Representation","items":[{"t":"Logic"},{"t":"Semantic Networks"},{"t":"Frames"},{"t":"Rules"},{"t":"Scripts"},{"t":"Conceptual Dependency and Ontologies"},{"t":"Expert Systems"},{"t":"Handling Uncertainty in Knowledge"}]},{"name":"Planning","items":[{"t":"Components of a Planning System"},{"t":"Linear and Non Linear Planning"},{"t":"Goal Stack Planning"},{"t":"Hierarchical Planning"},{"t":"STRIPS"},{"t":"Partial Order Planning"}]},{"name":"Natural Language Processing","items":[{"t":"Grammar and Language"},{"t":"Parsing Techniques"},{"t":"Semantic Analysis and Pragmatics"}]},{"name":"Multi Agent Systems","items":[{"t":"Agents and Objects"},{"t":"Agents and Expert Systems"},{"t":"Generic Structure of Multiagent System"},{"t":"Semantic Web"},{"t":"Agent Communication"},{"t":"Knowledge Sharing using Ontologies"},{"t":"Agent Development Tools"}]},{"name":"Fuzzy Sets","items":[{"t":"Notion of Fuzziness"},{"t":"Membership Functions"},{"t":"Fuzzification and Defuzzification"},{"t":"Operations on Fuzzy Sets"},{"t":"Fuzzy Functions and Linguistic Variables"},{"t":"Fuzzy Relations"},{"t":"Fuzzy Rules and Fuzzy Inference"},{"t":"Fuzzy Control System and Fuzzy Rule Based Systems"}]},{"name":"Genetic Algorithms (GA)","items":[{"t":"Encoding Strategies"},{"t":"Genetic Operators"},{"t":"Fitness Functions and GA Cycle"},{"t":"Problem Solving using GA"}]},{"name":"Artificial Neural Networks (ANN)","items":[{"t":"Supervised Learning"},{"t":"Unsupervised Learning"},{"t":"Reinforcement Learning"},{"t":"Single Perceptron"},{"t":"Multi Layer Perceptron"},{"t":"Self Organizing Maps"},{"t":"Hopfield Network"}]}]}]},{"id":3,"pfx":"en","roman":"Paper II","pill":"Paper II · English","title":"English","short":"English","code":"30","units":[{"n":1,"name":"Drama","topics":[{"name":"Drama","items":[{"t":"Drama"}]},{"name":"Comprehension passages (critical reading, critical thinking and writing skills)","items":[{"t":"Critical reading"},{"t":"Critical thinking"},{"t":"Writing skills"}]}]},{"n":2,"name":"Poetry","topics":[{"name":"Poetry","items":[{"t":"Poetry"}]},{"name":"Comprehension passages (critical reading, critical thinking and writing skills)","items":[{"t":"Critical reading"},{"t":"Critical thinking"},{"t":"Writing skills"}]}]},{"n":3,"name":"Fiction, short story","topics":[{"name":"Fiction, short story","items":[{"t":"Fiction"},{"t":"Short story"}]},{"name":"Comprehension passages (critical reading, critical thinking and writing skills)","items":[{"t":"Critical reading"},{"t":"Critical thinking"},{"t":"Writing skills"}]}]},{"n":4,"name":"Non-Fictional Prose","topics":[{"name":"Non-Fictional Prose","items":[{"t":"Non-Fictional Prose"}]},{"name":"Comprehension passages (critical reading, critical thinking and writing skills)","items":[{"t":"Critical reading"},{"t":"Critical thinking"},{"t":"Writing skills"}]}]},{"n":5,"name":"Language: Basic concepts, theories and pedagogy. English in Use","topics":[{"name":"Language: Basic concepts, theories and pedagogy","items":[{"t":"Basic concepts"},{"t":"Theories"},{"t":"Pedagogy"}]},{"name":"English in Use","items":[{"t":"English in Use"}]}]},{"n":6,"name":"English in India: history, evolution and futures","topics":[{"name":"English in India","items":[{"t":"History"},{"t":"Evolution"},{"t":"Futures"}]}]},{"n":7,"name":"Cultural Studies","topics":[{"name":"Cultural Studies","items":[{"t":"Cultural Studies"}]}]},{"n":8,"name":"Literary Criticism","topics":[{"name":"Literary Criticism","items":[{"t":"Literary Criticism"}]}]},{"n":9,"name":"Literary Theory post World War II","topics":[{"name":"Literary Theory post World War II","items":[{"t":"Literary Theory post World War II"}]}]},{"n":10,"name":"Research Methods and Materials in English","topics":[{"name":"Research Methods and Materials in English","items":[{"t":"Research Methods and Materials in English"}]}]}]}];
+const ST=[['s','Studied'],['n','Notes Made'],['q','Practiced Questions'],['v','Revised']];
+const SH={s:'Studied',n:'Notes',q:'Practice',v:'Revised'};
+const COL={s:'var(--cs)',n:'var(--cn)',q:'var(--cq)',v:'var(--cv)'};
+const blank=()=>({c:{},p:{},f:{},r:{},days:{},paper:1});
+let S=blank(),docRef=null,saveTimer=null,dirty=false,sel=null,viewY,viewM;
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const todayS=()=>iso(new Date());
+const curP=()=>PAPERS.find(p=>p.id===S.paper)||PAPERS[0];
+// ---- index ----
+const IDX={},SUBS={};
+PAPERS.forEach(P=>{P.tot=0;P.topicN=0;P.subKeys=[];
+  P.units.forEach(u=>{u.key=P.pfx+'u'+u.n;u.topics.forEach((t,ti)=>{
+    t.key=u.key+'t'+ti;P.topicN++;SUBS[t.key]=[];let j=0;
+    const add=(label,l2)=>{const k=t.key+'s'+(j++);SUBS[t.key].push(k);P.subKeys.push(k);IDX[k]={P:P.id,u:u.n,t:t.name,label,l2};P.tot++};
+    t.items.forEach(i=>{add(i.t,false);if(i.c)i.c.forEach(c=>add(c,true))});
+  })});
+});
+function toast(m){const t=$('#toast');t.innerHTML='<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg><span>'+esc(m)+'</span>';t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2200)}
+function setState(x){$('#saveState').textContent=x}
+function loadLocal(){try{const v=localStorage.getItem('ugcnet_tracker_standalone_v1');if(v)S=Object.assign(blank(),JSON.parse(v))}catch(e){}}
+let lsOK=true;function saveLocal(){try{localStorage.setItem('ugcnet_tracker_standalone_v1',JSON.stringify(S));lsOK=true}catch(e){lsOK=false}}
+function flush(){if(docRef&&dirty){dirty=false;try{docRef.set({state:JSON.stringify(S),v:3})}catch(e){}}}
+addEventListener('pagehide',flush);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')flush()});
+function queueSave(){S.ts=Date.now();dirty=true;saveLocal();setState('Saving…');clearTimeout(saveTimer);
+  saveTimer=setTimeout(async()=>{
+    dirty=false;
+    if(docRef){try{await docRef.set({state:JSON.stringify(S),v:3});setState('Saved')}catch(e){setState('Saved on this device only')}}
+    else setState(lsOK?'Saved on this device':'Not saved: browser storage blocked, use Export')},500)}
+function migrate(){
+  S.p=S.p||{};S.days=S.days||{};S.c=S.c||{};S.r=S.r||{};S.f=S.f||{};if(!S.paper)S.paper=1;
+  Object.keys(S.c).forEach(k=>{if(/s\d+$/.test(k)){S.p[k]=S.p[k]||{};if(!S.p[k].s)S.p[k].s='-';delete S.c[k]}});
+}
+function setStage(k,c,on){
+  S.p[k]=S.p[k]||{};
+  if(on){if(!S.p[k][c]||S.p[k][c]==='-')S.p[k][c]=todayS()}else delete S.p[k][c];
+  if(!Object.keys(S.p[k]).length)delete S.p[k];
+}
+const isFull=k=>S.p[k]&&ST.every(x=>S.p[k][x[0]]);
+// ---- build syllabus (both papers) ----
+function buildSyl(){
+  const host=$('#syl');host.innerHTML='';
+  PAPERS.forEach(P=>{
+    const pane=document.createElement('div');pane.className='pane';pane.id='syl-'+P.id;host.appendChild(pane);
+    P.units.forEach(u=>{
+      const d=document.createElement('div');d.className='unit';d.id=u.key;
+      let h='<div class="uh" role="button" tabindex="0" aria-expanded="true"><input type="checkbox" data-c="'+u.key+'" title="Mark unit complete"><div class="t">UNIT '+u.n+': '+esc(u.name.toUpperCase())+'</div><div><div class="c" data-uc="'+u.key+'"></div><div class="pb"><i data-ub="'+u.key+'"></i></div></div><span class="caret">▾</span></div><div class="ub">';
+      u.topics.forEach((t,ti)=>{
+        h+='<div class="topic" data-topic="'+t.key+'"><div class="th"><label><input type="checkbox" data-c="'+t.key+'"><span class="n">'+(ti+1)+'. '+esc(t.name)+'</span></label><span class="c" data-tc="'+t.key+'"></span></div>';
+        h+='<table class="st"><tr><th>Subtopic</th>'+ST.map(x=>'<th data-col="'+x[0]+'" data-tk="'+t.key+'" title="Tick all / untick all">'+x[1].replace('Practiced Questions','Practice').replace(' Made','')+'</th>').join('')+'</tr>';
+        let j=0;
+        t.items.forEach(i=>{
+          const k=t.key+'s'+(j++);
+          h+='<tr data-row="'+k+'" class="'+(i.c?'p':'')+'"><td>'+esc(i.t)+'</td>'+ST.map(x=>'<td><input type="checkbox" data-k="'+k+'" data-st="'+x[0]+'" aria-label="'+x[1]+'"></td>').join('')+'</tr>';
+          if(i.c)i.c.forEach(c=>{const k2=t.key+'s'+(j++);h+='<tr data-row="'+k2+'" class="l2"><td>'+esc(c)+'</td>'+ST.map(x=>'<td><input type="checkbox" data-k="'+k2+'" data-st="'+x[0]+'" aria-label="'+x[1]+'"></td>').join('')+'</tr>'});
+        });
+        h+='</table></div>';
+      });
+      d.innerHTML=h+'</div>';pane.appendChild(d);
+      const uh=d.querySelector('.uh');const tg=()=>{d.classList.toggle('closed');uh.setAttribute('aria-expanded',!d.classList.contains('closed'))};uh.addEventListener('click',e=>{if(e.target.tagName==='INPUT')return;tg()});uh.addEventListener('keydown',e=>{if(e.target!==uh)return;if(e.key==='Enter'||e.key===' '){e.preventDefault();tg()}});
+    });
+  });
+  host.addEventListener('change',e=>{
+    const t=e.target;
+    if(t.dataset.c){if(t.checked){S.c[t.dataset.c]=1;if(!/t\d+$/.test(t.dataset.c))toast('Unit complete!')}else delete S.c[t.dataset.c];refresh();queueSave();return}
+    if(t.dataset.k){
+      const k=t.dataset.k,tk=k.replace(/s\d+$/,'');
+      const before=SUBS[tk].every(isFull);
+      setStage(k,t.dataset.st,t.checked);t.classList.add('pop');
+      refresh();queueSave();
+      if(!before&&SUBS[tk].every(isFull))toast('Topic fully mastered!');
+    }
+  });
+  host.addEventListener('click',e=>{
+    const th=e.target.closest('th[data-col]');if(!th)return;
+    const tk=th.dataset.tk,c=th.dataset.col;
+    const all=SUBS[tk].every(k=>S.p[k]&&S.p[k][c]);
+    SUBS[tk].forEach(k=>setStage(k,c,!all));
+    refresh();queueSave();
+  });
+}
+// ---- stats ----
+function unitPct(u){let tot=0,done=0;u.topics.forEach(t=>SUBS[t.key].forEach(k=>{tot+=4;if(S.p[k])ST.forEach(x=>{if(S.p[k][x[0]])done++})}));return{tot,done,pct:tot?done/tot:0}}
+function counts(P){
+  const per={s:0,n:0,q:0,v:0};let tc=0,uc=0;
+  P.subKeys.forEach(k=>{if(S.p[k])ST.forEach(x=>{if(S.p[k][x[0]])per[x[0]]++})});
+  P.units.forEach(u=>{if(S.c[u.key])uc++;u.topics.forEach(t=>{if(S.c[t.key])tc++})});
+  return{per,tc,uc};
+}
+function activity(){
+  const m={};
+  Object.keys(S.p).forEach(k=>{if(!IDX[k])return;ST.forEach(x=>{const d=S.p[k][x[0]];if(d&&d!=='-')(m[d]=m[d]||[]).push({k,st:x[0]})})});
+  return m;
+}
+function ring(p,color){const r=22,c=2*Math.PI*r;return '<svg width="54" height="54"><circle cx="27" cy="27" r="'+r+'" fill="none" stroke="rgba(255,255,255,.09)" stroke-width="6"/><circle cx="27" cy="27" r="'+r+'" fill="none" stroke="'+color+'" stroke-width="6" stroke-linecap="round" stroke-dasharray="'+c+'" stroke-dashoffset="'+(c*(1-p))+'" style="transition:stroke-dashoffset .6s"/></svg>'}
+function renderDash(){
+  const P=curP(),{per,tc,uc}=counts(P),act=activity(),manual=S.days||{};
+  const allDays=new Set([...Object.keys(act),...Object.keys(manual).filter(d=>manual[d])]);
+  const total4=P.tot*4,done4=ST.reduce((a,x)=>a+per[x[0]],0),pct=total4?Math.round(done4*1000/total4)/10:0;
+  let streak=0,d=new Date();if(!allDays.has(iso(d)))d.setDate(d.getDate()-1);
+  while(allDays.has(iso(d))){streak++;d.setDate(d.getDate()-1)}
+  const tcount=(act[todayS()]||[]).length;
+  $('#cDays').textContent=allDays.size+' days studied';
+  $('#cStreak').textContent=streak+'-day streak';
+  const ex=S.f&&S.f.exam;
+  if(ex){const left=Math.ceil((new Date(ex+'T00:00')-new Date(todayS()+'T00:00'))/864e5);$('#cExam').textContent=left>=0?left+' days to exam':'Exam date passed'}else $('#cExam').textContent='Set exam date';
+  $('#progT').textContent=P.roman+' · progress summary';
+  $('#kpis').innerHTML=[[pct+'%','Overall completion'],[uc+' / '+P.units.length,'Units completed'],[tc+' / '+P.topicN,'Main topics completed'],[per.s+' / '+P.tot,'Subtopics studied'],[tcount,'Ticks today (both papers)']].map(x=>'<div class="kpi"><b>'+x[0]+'</b><span>'+x[1]+'</span></div>').join('');
+  $('#stages').innerHTML=ST.map(x=>{const p=P.tot?per[x[0]]/P.tot*100:0;return '<div class="stage"><span><i class="sd" style="color:'+COL[x[0]]+';background:'+COL[x[0]]+'"></i>'+x[1]+'</span><div class="bar"><i style="width:'+p+'%;background:'+COL[x[0]]+';color:'+COL[x[0]]+'"></i></div><b>'+Math.round(p)+'%</b></div>'}).join('');
+  $('#rings').innerHTML=P.units.map(u=>{const up=unitPct(u);return '<button type="button" class="ringcard" data-go="'+u.key+'"><div class="ring">'+ring(up.pct,'url(#rg)')+'<b>'+Math.round(up.pct*100)+'%</b></div><div class="rc-t"><b>Unit '+u.n+'</b>'+esc(u.name)+'</div></button>'}).join('');
+  renderCal(act);
+}
+function renderCal(act){
+  const now=new Date();if(viewY==null){viewY=now.getFullYear();viewM=now.getMonth()}
+  $('#monthT').textContent=new Date(viewY,viewM,1).toLocaleString('en',{month:'long',year:'numeric'});
+  const first=new Date(viewY,viewM,1),dim=new Date(viewY,viewM+1,0).getDate(),lead=first.getDay();
+  let h=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(x=>'<div class="dow">'+x+'</div>').join('');
+  for(let i=0;i<lead;i++)h+='<div class="day out"></div>';
+  const ts=todayS();
+  for(let dd=1;dd<=dim;dd++){
+    const ds=viewY+'-'+String(viewM+1).padStart(2,'0')+'-'+String(dd).padStart(2,'0');
+    const n=(act[ds]||[]).length,man=S.days&&S.days[ds];
+    const lvl=n===0?(man?1:0):n<3?1:n<8?2:n<16?3:4;
+    h+='<button type="button" class="day'+(lvl?' l'+lvl:'')+(ds===ts?' today':'')+(ds===sel?' sel':'')+'" data-d="'+ds+'" aria-label="'+ds+(n?', '+n+' items studied':'')+(man?', marked as studied':'')+'" aria-pressed="'+(ds===sel)+'">'+dd+(n?'<small>'+n+'</small>':'')+(man?'<span class="mk"></span>':'')+'</button>';
+  }
+  $('#cal').innerHTML=h;renderDetail(act);
+}
+function renderDetail(act){
+  const el=$('#detail');
+  if(!sel){el.innerHTML='Tap a day to see what you studied.';return}
+  const list=act[sel]||[],man=S.days&&S.days[sel],g={};
+  list.forEach(a=>{(g[a.k]=g[a.k]||[]).push(a.st)});
+  const nice=new Date(sel+'T00:00').toLocaleDateString('en',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  let h='<b>'+nice+'</b>'+(man?' · marked as studied':'');
+  const ks=Object.keys(g);
+  if(!ks.length)h+='<div class="note" style="margin-top:4px">No ticks recorded this day.</div>';
+  else h+='<ul>'+ks.map(k=>{const m=IDX[k];return '<li>'+PAPERS.find(x=>x.id===m.P).pill+' · Unit '+m.u+' · '+esc(m.t)+' › <b>'+esc(m.label)+'</b> <span class="tags">'+g[k].map(s=>'<span style="background:'+COL[s]+'">'+SH[s]+'</span>').join('')+'</span></li>'}).join('')+'</ul>';
+  el.innerHTML=h;
+}
+// ---- top fields + revision ----
+function buildTop(){
+  const f=[['name','Candidate Name','text'],['start','Preparation Start Date','date'],['exam','Target Examination Date','date'],['done','Target Completion Date','date']];
+  $('#fields').innerHTML=f.map(x=>'<div><label class="f">'+x[1]+'</label><input type="'+x[2]+'" data-f="'+x[0]+'"></div>').join('');
+  $$('[data-f]').forEach(i=>i.addEventListener('input',()=>{S.f[i.dataset.f]=i.value;renderDash();queueSave()}));
+  const cols=['First Study','First Revision','Second Revision','Final Revision'];
+  const host=$('#revs');host.innerHTML='';
+  PAPERS.forEach(P=>{
+    const w=document.createElement('div');w.className='pane wide';w.id='rev-'+P.id;
+    let h='<table class="rv"><tr><th>Unit</th>'+cols.map(c=>'<th>'+c+'</th>').join('')+'</tr>';
+    P.units.forEach(u=>{h+='<tr><td>Unit '+u.n+'<div class="note" style="font-weight:400">'+esc(u.name)+'</div></td>'+cols.map((c,i)=>'<td data-label="'+c+'"><input type="checkbox" aria-label="'+c+', unit '+u.n+'" data-rv="'+u.key+'r'+i+'" data-st="'+'snqv'[i]+'"><input type="date" aria-label="Date" data-rd="'+u.key+'r'+i+'"></td>').join('')+'</tr>'});
+    w.innerHTML=h+'</table>';host.appendChild(w);
+  });
+  host.addEventListener('change',e=>{const t=e.target;
+    if(t.dataset.rv)S.r[t.dataset.rv]=Object.assign(S.r[t.dataset.rv]||{},{on:t.checked?1:0});
+    if(t.dataset.rd)S.r[t.dataset.rd]=Object.assign(S.r[t.dataset.rd]||{},{date:t.value});
+    queueSave()});
+  $('#papers').innerHTML=PAPERS.map(P=>'<button data-paper="'+P.id+'">'+P.pill+'<small>'+esc(P.short)+'</small></button>').join('');
+  $$('#papers button').forEach(b=>b.addEventListener('click',()=>{S.paper=+b.dataset.paper;queueSave();showPaper();refresh()}));
+}
+function showPaper(){
+  const P=curP();
+  $$('#papers button').forEach(b=>{const on=+b.dataset.paper===P.id;b.classList.toggle('on',on);b.setAttribute('aria-pressed',on)});
+  PAPERS.forEach(x=>{$('#syl-'+x.id).classList.toggle('on',x.id===P.id);$('#rev-'+x.id).classList.toggle('on',x.id===P.id)});
+  $('#heroSub').textContent=P.roman+' · '+P.title+' · Code '+P.code;
+  $('#revT').textContent=P.roman+' · revision tracker';
+  coll=false;$('#toggleAll').textContent='Collapse all';$$('.unit').forEach(u=>u.classList.remove('closed'));
+}
+// ---- refresh ----
+function refresh(){
+  $$('[data-c]').forEach(i=>i.checked=!!S.c[i.dataset.c]);
+  $$('input[data-k]').forEach(i=>{const p=S.p[i.dataset.k];const v=p&&p[i.dataset.st];i.checked=!!v;i.title=v&&v!=='-'?'Done on '+v:''});
+  PAPERS.forEach(P=>P.units.forEach(u=>{
+    const up=unitPct(u);
+    $('[data-uc="'+u.key+'"]').textContent=Math.round(up.pct*100)+'% · '+up.done+'/'+up.tot;
+    $('[data-ub="'+u.key+'"]').style.width=up.pct*100+'%';
+    u.topics.forEach(t=>{const ks=SUBS[t.key],full=ks.filter(isFull).length,el=$('[data-topic="'+t.key+'"]');
+      $('[data-tc="'+t.key+'"]').textContent=full+' / '+ks.length+' mastered';
+      el.querySelector('.th').classList.toggle('done',!!S.c[t.key]);
+      ks.forEach(k=>$('[data-row="'+k+'"]').classList.toggle('full',!!isFull(k)));
+    });
+  }));
+  $$('[data-rv]').forEach(i=>i.checked=!!(S.r[i.dataset.rv]&&S.r[i.dataset.rv].on));
+  $$('[data-rd]').forEach(i=>i.value=(S.r[i.dataset.rd]&&S.r[i.dataset.rd].date)||'');
+  $$('[data-f]').forEach(i=>{if(document.activeElement!==i)i.value=S.f[i.dataset.f]||''});
+  applyFilter();renderDash();
+}
+function applyFilter(){
+  const q=$('#q').value.trim().toLowerCase(),f=$('#flt').value;
+  $$('.topic').forEach(tp=>{let any=false;const tn=tp.querySelector('.n').textContent.toLowerCase();
+    tp.querySelectorAll('tr[data-row]').forEach(r=>{const k=r.dataset.row;
+      const okq=!q||tn.includes(q)||r.textContent.toLowerCase().includes(q);
+      const okf=f==='all'||(f==='any'?!!S.p[k]:!(S.p[k]&&S.p[k][f]));
+      const show=okq&&okf;r.classList.toggle('hide',!show);if(show)any=true});
+    tp.classList.toggle('hide',!any)});
+  if(q||f!=='all')$$('.unit').forEach(u=>u.classList.remove('closed'));
+  $$('.unit').forEach(u=>u.querySelector('.uh').setAttribute('aria-expanded',!u.classList.contains('closed')));
+  const vis=$$('#syl-'+curP().id+' .topic:not(.hide)').length;$('#empty').classList.toggle('hide',vis>0);
+}
+// ---- events ----
+$$('.tabs button').forEach(b=>b.addEventListener('click',()=>{
+  $$('.tabs button').forEach(x=>{x.classList.toggle('on',x===b);x.setAttribute('aria-current',x===b?'page':'false')});
+  $$('.tab').forEach(t=>t.classList.toggle('on',t.id==='t-'+b.dataset.tab));
+  window.scrollTo({top:0,behavior:'smooth'})}));
+$('#q').addEventListener('input',applyFilter);$('#flt').addEventListener('change',applyFilter);
+let coll=false;
+$('#toggleAll').addEventListener('click',e=>{coll=!coll;$$('#syl-'+curP().id+' .unit').forEach(u=>u.classList.toggle('closed',coll));e.target.textContent=coll?'Expand all':'Collapse all'});
+$('#prev').addEventListener('click',()=>{viewM--;if(viewM<0){viewM=11;viewY--}renderCal(activity())});
+$('#next').addEventListener('click',()=>{viewM++;if(viewM>11){viewM=0;viewY++}renderCal(activity())});
+$('#cal').addEventListener('click',e=>{const d=e.target.closest('.day[data-d]');if(!d)return;sel=d.dataset.d;renderCal(activity())});
+function toggleDay(ds){S.days=S.days||{};if(S.days[ds])delete S.days[ds];else S.days[ds]=1;refresh();queueSave()}
+$('#markToday').addEventListener('click',()=>{const t=todayS();if(!S.days[t]){toggleDay(t);toast('Today marked as studied')}else toast('Already marked')});
+$('#markSel').addEventListener('click',()=>{if(!sel)return toast('Tap a day first');toggleDay(sel)});
+$('#rings').addEventListener('click',e=>{const c=e.target.closest('[data-go]');if(!c)return;
+  $$('.tabs button')[1].click();setTimeout(()=>{const u=document.getElementById(c.dataset.go);u.classList.remove('closed');u.scrollIntoView({behavior:'smooth'})},50)});
+$('#resetP').addEventListener('click',()=>{const P=curP();if(!confirm('Clear all ticks and revision data for '+P.pill+'? This cannot be undone.'))return;
+  P.subKeys.forEach(k=>delete S.p[k]);
+  P.units.forEach(u=>{delete S.c[u.key];Object.keys(S.r).forEach(k=>{if(k.startsWith(u.key+'r'))delete S.r[k]});u.topics.forEach(t=>delete S.c[t.key])});
+  refresh();queueSave()});
+$('#resetAll').addEventListener('click',()=>{if(!confirm('Clear EVERYTHING for both papers, including calendar days and your fields? This cannot be undone.'))return;
+  const keep=S.paper;S=blank();S.paper=keep;sel=null;refresh();queueSave()});
+
+setState('Saved on this device');loadLocal();migrate();buildTop();buildSyl();showPaper();refresh();sel=todayS();renderCal(activity());
+
+
+(function(){
+  const els=[...document.querySelectorAll('.card,.unit')];
+  els.forEach((el,i)=>{el.classList.add('reveal');el.style.setProperty('--i',i%5)});
+  if(!('IntersectionObserver' in window)){els.forEach(e=>e.classList.add('in'));return}
+  const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.06,rootMargin:'0px 0px -40px 0px'});
+  els.forEach(e=>io.observe(e));
+})();
+
+(function(){
+  const dl=()=>{const b=new Blob([JSON.stringify(S,null,1)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='ugc-net-tracker-backup-'+todayS()+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1500);toast('Backup downloaded')};
+  $('#exportBtn').addEventListener('click',dl);
+  $('#importBtn').addEventListener('click',()=>$('#importFile').click());
+  $('#importFile').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();
+    r.onload=()=>{try{const d=JSON.parse(r.result);if(!d||typeof d!=='object'||typeof d.p!=='object')throw new Error('bad');
+      S=Object.assign(blank(),d);migrate();queueSave();showPaper();refresh();renderCal(activity());toast('Backup restored')}catch(x){toast('That file is not a valid backup')}};
+    r.readAsText(f);e.target.value=''});
+})();
+</script></body></html>
